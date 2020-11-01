@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../model/User');
+const Course = require('../model/Course');
 
 const createUser = async(req, res) => {
   const { email, password, role } = req.body;
@@ -100,7 +101,59 @@ const login = async(req, res) => {
 const checkToken = () => {
   
 }
+const addCourse = async(req, res) => {
+  const {course_name, description,lecturer_id} = req.body;
+  var newCourse = {
+    name: course_name,
+    description: description,
+    videos : [],
+    students: [],
+    lecturer:lecturer_id,
+    schemester: ' ',
+
+  }
+  const course = new Course(newCourse);
+  course.save()
+    .then(() => res.status(200).json({status:true, message: ' thêm khóa học thành công!'}))
+    .catch(() => res.status(500).json({status:false , message: ' thêm thất bại!'}))
+}
+const delCourse = async(req, res) => {
+  const {course_id,} = req.query;
+  const course = await Course.findOne({_id:course_id})
+  if(course) {
+    Course.deleteOne({_id:course_id})
+      .then(() => res.status(200).json({message: 'ok'}))
+      .catch(() => res.status(500).json({message:'fail'}))
+  } else {
+    return res.status(409).json({status:false,message:'khoa hoc khong ton tai'})
+  }
+  
+
+}
+const updateCourse = async(req, res) =>{
+  const {course_id, course_name, description} = req.body;
+  const course = await Course.findOne({_id:course_id})
+  if(course){
+    var newCourse = {
+      name:course_name,
+      description: description,
+      students: course.students,
+      videos: course.videos,
+      lecturer: course.lecturer,
+      schemester: course.schemester,
+     }
+    Course.updateOne({_id:course._id}, newCourse)
+     .then(() => res.status(200).json({message:'ok'}))
+     .catch(() => res.status(500).json({message:'fail'}))
+  } else {
+return res.status(409).json({message:'khoa hoc khong ton tai'})
+  }
+}
 module.exports = {
   createUser,
-  login
+  login,
+  checkToken,
+  addCourse,
+  delCourse,
+  updateCourse
 }

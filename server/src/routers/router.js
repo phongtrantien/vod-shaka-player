@@ -7,10 +7,14 @@ const isLecture = require("../middleware/checkIsLecture");
 
 router.post('/user', userController.createUser);
 router.post('/login', userController.login);
-router.get('/token', auth, userController.checkToken)
+// router.get('/token', auth, userController.checkToken)
 
 // test check is lecture
 router.get('/test', auth, isLecture, videoController.createFile)
 
+
+router.post('/add-course',auth,isLecture, userController.addCourse);
+router.get('/delete-course',auth, isLecture, userController.delCourse);
+router.post('/update-course',auth, isLecture, userController.updateCourse)
 
 module.exports = router;
